@@ -6,4 +6,4 @@ echo "------------------------"
 dcFile='development/docker-compose.yaml'
 # docker compose -f $dcFile --project-directory ../ down
 docker compose -f $dcFile --project-directory ../ up db-svc-mongo -d
-docker compose -f $dcFile --project-directory ../ up app-svc-vehicle
+docker compose -f $dcFile --project-directory ../ up app-svc-vehicle app-svc-client
