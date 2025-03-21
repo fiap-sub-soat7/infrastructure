@@ -1,0 +1,32 @@
+name: SonarQube Scan
+
+on: 
+  workflow_dispatch:
+  workflow_call: 
+    secrets:
+      SONAR_TOKEN:
+        required: true
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: SonarQube Scan
+      uses: sonarsource/sonarqube-scan-action@v3
+      # uses: sonarsource/sonarqube-quality-gate-action@master # to force fail pipeline
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: http://sast.blackode.tech/
+      with:
+        projectBaseDir: ./
+        args: >
+          -Dsonar.projectKey=app-ms-${{ github.event.repository.name }}
+          -Dsonar.typescript.lcov.reportPaths=./coverage/lcov.info
+          -Dsonar.tests=test/
+          -Dsonar.sources=src/
+          -Dsonar.exclusions=src/infrastructure/**
+          -Dsonar.verbose=true

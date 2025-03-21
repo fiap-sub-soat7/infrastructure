@@ -1,0 +1,99 @@
+name: SonarQube offline Scan
+
+on: 
+  workflow_dispatch:
+  workflow_call: 
+    secrets:
+      SONAR_TOKEN:
+        required: true
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: SonarQube build
+      env:
+        SONAR_APP: app-${{ github.event.repository.name }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        cat <<-EOF > "Dockerfile"
+        FROM sonarqube:9.9.7-community
+
+        USER root
+        RUN apt-get update && \\
+            apt-get install -y unzip curl gnupg lsb-release ca-certificates && \\
+            curl -sSLo /tmp/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip && \\
+            unzip -qq /tmp/sonar-scanner.zip -d /opt && \\
+            ln -s /opt/sonar-scanner-4.6.2.2472-linux /opt/sonar-scanner
+        RUN rm -rf /var/lib/apt/lists/*
+        RUN rm /tmp/sonar-scanner.zip
+
+        ENV SONAR_SCANNER_HOME=/opt/sonar-scanner
+        ENV PATH=\$PATH:\$SONAR_SCANNER_HOME/bin
+
+        RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+        RUN apt-get install -y nodejs
+
+        # cloud
+        EXPOSE 9000 
+        # cli
+        EXPOSE 9001 
+
+        RUN echo "echo 'wait...'; until echo \"\\\$sonarStatus\" | grep -q '\"status\":\"UP\"'; do \\
+            sonarStatus=\\\$(curl -s http://localhost:9000/api/system/status); \\
+            echo \"\\\$sonarStatus\" || \"...\"; \\
+            sleep 1; \\
+          done" > wait-health.sh
+        RUN chmod +x wait-health.sh
+
+        RUN echo "echo 'wait...'; until echo \"\\\$sonarStatus\" | grep -vi '\"status\":\"IN_PROGRESS\"'; do \\
+            sonarStatus=\\\$(curl -u $SONAR_TOKEN -s http://localhost:9000/api/ce/activity?component=$SONAR_APP); \\
+            echo \"\\\$sonarStatus\" || \"...\"; \\
+            sleep 1; \\
+          done" > wait-task.sh
+        RUN chmod +x wait-task.sh
+
+        RUN echo "echo 'scanning...'; cd /app; sonar-scanner" > scan.sh
+        RUN chmod +x scan.sh
+
+        USER sonarqube
+
+        EOF
+
+        docker build . -t custom-sonarqube:latest
+        rm -rf Dockerfile
+
+    - name: SonarQube start
+      run: |
+        docker run -d --name run-sonarqube \
+          -v ./:/app \
+          -p 9090:9000 \
+          -p 9091:9001 \
+          -e "SONAR_JDBC_URL=jdbc:postgresql://dpg-ct334ohu0jms7392r300-a.oregon-postgres.render.com/sast_0g12" \
+          -e "SONAR_JDBC_USERNAME=sonar_usr" \
+          -e "SONAR_JDBC_PASSWORD=z3XLYoLUbg9IYJ86RN7QjmZQFYCjQYaU" \
+          custom-sonarqube:latest
+
+    - name: SonarQube wait to be healthy
+      run: docker exec run-sonarqube bash wait-health.sh
+
+    - name: SonarQube config
+      run: |
+        cat <<-EOF > "sonar-project.properties"
+        sonar.projectKey=$SONAR_APP
+        sonar.login=$SONAR_TOKEN
+        sonar.host.url=http://localhost:9000/
+        sonar.sources=src
+        EOF
+
+        cat "sonar-project.properties"
+
+    - name: SonarQube Scan
+      run: docker exec -u 0 run-sonarqube bash scan.sh
+
+    - name: SonarQube wait task
+      run: docker exec run-sonarqube bash wait-task.sh

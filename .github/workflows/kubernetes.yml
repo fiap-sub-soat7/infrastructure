@@ -1,0 +1,94 @@
+name: Kubernetes (ALB)
+
+on:
+  workflow_run:
+    workflows: ["Infrastructure"]
+    types:
+      - completed
+
+
+env:
+  CLUSTER_NAME: "t75-eks-cluster"
+  ACCOUNT_NAME: "t75-sa-eks-ec2"
+
+jobs:
+  k8s-deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout infrastructure
+      uses: actions/checkout@v4
+      with: 
+        ref: tcg-v4 # only to separate tech challenge versions
+
+    - name: Configure AWS user credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ vars.AWS_REGION }}
+
+    - name: Configure EKS AWS
+      run: |
+        aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+    
+    - name: Process envs
+      run: |
+        echo "AWS_SUBNET_IDS=$(aws ec2 describe-subnets --query "Subnets[*].SubnetId" --output text --filter "Name=tag:Name,Values=t75*" | tr '\t' ', ')" >> $GITHUB_ENV
+        echo "AWS_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --query "SecurityGroups[*].GroupId" --output text --filter "Name=group-name,Values=t75*")" >> $GITHUB_ENV
+        echo "AWS_VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=t75*" --query "Vpcs[0].VpcId" --output text)" >> $GITHUB_ENV
+        echo "AWS_REGION=${{ vars.AWS_REGION }}" >> $GITHUB_ENV
+        echo "AWS_ACCOUNT_ID=${{ vars.AWS_ACCOUNT_ID }}" >> $GITHUB_ENV
+        echo "AWS_LB_ARN=$(aws elbv2 describe-load-balancers --names t75-lb-ingress --region ${{ vars.AWS_REGION }} --query="LoadBalancers[0].LoadBalancerArn" --output text)" >> $GITHUB_ENV
+        echo "AWS_LB_NAME=t75-lb-ingress" >> $GITHUB_ENV
+    
+    - name: Replace YAML envs
+      run: |
+        sed -i "s@AWS_ACCOUNT_ID@$AWS_ACCOUNT_ID@" kubernetes/service-account.yaml
+
+        sed -i "s@AWS_ACCOUNT_ID@$AWS_ACCOUNT_ID@" kubernetes/pods/dp-payment.yaml
+        sed -i "s@AWS_ACCOUNT_ID@$AWS_ACCOUNT_ID@" kubernetes/pods/dp-vehicle.yaml
+        sed -i "s@AWS_ACCOUNT_ID@$AWS_ACCOUNT_ID@" kubernetes/pods/dp-inventory.yaml
+
+        encodedPass=$(base64 -w 0 <<< "${{ secrets.DB_SVC_URL }}")
+        sed -i "s@DB_SVC_URL\:@& \"$encodedPass\"@" kubernetes/env/secrets.yaml
+
+        sed -i "s@\/subnets\:@& $AWS_SUBNET_IDS@" kubernetes/ingress.yaml
+        sed -i "s@\/security-groups\:@& $AWS_SECURITY_GROUP_ID@" kubernetes/ingress.yaml
+        sed -i "s@\/load-balancer-arn\:@& $AWS_LB_ARN@" kubernetes/ingress.yaml
+        sed -i "s@AWS_LB_NAME@$AWS_LB_NAME@" kubernetes/ingress.yaml
+        
+    - name: Create Kubernetes ServiceAccount - ALB
+      run: |
+        kubectl apply -f ./kubernetes/service-account.yaml \
+          -n kube-system
+
+    - name: Install Helm
+      run: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        helm repo add eks https://aws.github.io/eks-charts
+        helm repo update eks
+
+    - name: Apply AWS Load Balancer Controller
+      env:
+        KUBE_CONFIG_PATH: /home/runner/.kube/config
+      run: |
+        # wget https://raw.githubusercontent.com/aws/eks-pod-identity-agent/main/hack/dev/ds.yaml
+        # kubectl apply -f ds.yaml
+
+        helm upgrade --install aws-load-balancer-controller eks/aws-load-balancer-controller \
+          -n kube-system \
+          --set clusterName=$CLUSTER_NAME \
+          --set region=$AWS_REGION \
+          --set vpcId=$AWS_VPC_ID \
+          --set serviceAccount.create=false \
+          --set serviceAccount.name=$ACCOUNT_NAME \
+          --set serviceAccount.ingressClass=alb
+
+    - name: Apply kubernetes deployment
+      run: |
+        kubectl apply -k . -n food-app
+        kubectl apply -f ./kubernetes/load-balancer.yaml

@@ -1,0 +1,72 @@
+name: Build to ECR
+on: 
+  workflow_call: 
+    inputs:
+      ENVS:
+        required: false
+        type: string
+      AWS_REGION: 
+        required: true
+        type: string
+      LAMBDA:
+        required: false
+        type: boolean
+    secrets:
+      AWS_ACCESS_KEY: 
+        required: true
+      AWS_SECRET: 
+        required: true
+      AWS_SESSION_TOKEN: 
+        required: true
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS user credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ inputs.AWS_REGION }}
+        
+      - name: Amazon ECR - Image Registry login
+        uses: aws-actions/amazon-ecr-login@v2.0.1
+        id: login-ecr
+
+      - name: Build project and push to ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: latest # ${{ github.sha, version tag }}
+          REPOSITORY: ms-${{ github.event.repository.name }}
+        run: |
+          docker build . -f Dockerfile.api -t $REGISTRY/$REPOSITORY:$IMAGE_TAG --progress=plain
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      - name: Update deployment - Kubernetes # IMPROVEMENT: only to dev/test envs
+        if: ${{ !inputs.LAMBDA }}
+        env:
+          CLUSTER_NAME: "t75-eks-cluster"
+          AWS_REGION: ${{ inputs.AWS_REGION }}
+          DEPLOYMENT: app-${{ github.event.repository.name }}-deployment
+        run: |
+          aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+
+          if [ -z "${{ inputs.ENVS }}" ]; then # if ENVS is provided, update pod envs
+            kubectl set env deployment/$DEPLOYMENT -n food-app ${{ inputs.ENVS }}
+          else
+            # `set env` already forces a rollout
+            kubectl rollout restart -n food-app deployment/$DEPLOYMENT
+          fi
+
+      - name: Update deployment - Lambda
+        if: ${{ inputs.LAMBDA }}
+        run: |
+          aws lambda update-function-code \
+            --function-name fn-${{ github.event.repository.name }} \
+            --image-uri ${{ steps.login-ecr.outputs.registry }}/ms-${{ github.event.repository.name }}:latest

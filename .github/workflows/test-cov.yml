@@ -1,0 +1,37 @@
+name: "Test source - Coverage"
+on: 
+  workflow_call: 
+    inputs:
+      COMMIT: 
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      DB_SVC_URL:
+        required: true
+
+jobs:
+  test-cov:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.1.0
+
+      - name: checkout source code
+        uses: actions/checkout@v3
+
+      - name: Run test/coverage
+        env:
+          DB_SVC_URL: ${{ secrets.DB_SVC_URL }}
+        run: |
+          npm ci
+          npm run test:badge
+
+      - name: Commit badges
+        if: ${{ inputs.COMMIT }}
+        run: |
+          git config --global user.name 't75-action'
+          git config --global user.email 't75@users.noreply.github.com'
+          git diff --quiet || (git add ./coverage && git commit -m "test: [ci] update coverage" && git push)

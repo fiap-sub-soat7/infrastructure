@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config-inventory
+data:
+  NODE_ENV: "development"
+  TZ: "America/Sao_Paulo"
+  NO_PROXY: "localhost,127.0.0.1"

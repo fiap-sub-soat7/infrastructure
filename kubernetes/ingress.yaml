@@ -1,0 +1,48 @@
+# not working in AWS Academy, student account doenst have a OIDC provider
+# need to configure addon https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html (we cant create a role on lab)
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: alb
+spec:
+  controller: ingress.k8s.aws/alb
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  annotations:
+    # alb.ingress.kubernetes.io/subnets:
+    # alb.ingress.kubernetes.io/security-groups:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/group.vehicle: "1000"
+    alb.ingress.kubernetes.io/group.name: AWS_LB_NAME
+    alb.ingress.kubernetes.io/load-balancer-name: AWS_LB_NAME
+    kubernetes.io/ingress.class: alb
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /vehicle/*
+        pathType: Prefix
+        backend:
+          service:
+            name: app-svc-vehicle
+            port:
+              number: 80
+      - path: /payment/*
+        pathType: Prefix
+        backend:
+          service:
+            name: app-svc-payment
+            port:
+              number: 80
+      - path: /inventory/*
+        pathType: Prefix
+        backend:
+          service:
+            name: app-svc-inventory
+            port:
+              number: 80
