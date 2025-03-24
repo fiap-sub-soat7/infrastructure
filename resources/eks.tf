@@ -1,6 +1,6 @@
 resource "aws_eks_cluster" "t75-eks_cluster" {
   name = "t75-eks-cluster"
-  role_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/LabRole"
+  role_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/root"
 
   vpc_config {
     subnet_ids = [aws_subnet.t75-vpc_subnet1.id, aws_subnet.t75-vpc_subnet2.id]
@@ -27,7 +27,7 @@ resource "aws_eks_access_policy_association" "t75-eks_access_policy" {
 resource "aws_eks_node_group" "t75-eks-node_group" {
   cluster_name = aws_eks_cluster.t75-eks_cluster.name
   node_group_name = "t75-eks-node-group"
-  node_role_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/LabRole"
+  node_role_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/root"
   subnet_ids = [aws_subnet.t75-vpc_subnet1.id, aws_subnet.t75-vpc_subnet2.id]
   instance_types = ["t3.medium"]
 
