@@ -15,7 +15,6 @@ resource "aws_eks_cluster" "t75-eks_cluster" {
 
   depends_on = [
     aws_iam_role_policy_attachment.eks_cluster_policy,
-    aws_iam_role_policy_attachment.eks_service_policy
   ]
 }
 
