@@ -11,8 +11,6 @@ on:
 env:
   TF_VAR_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
   TF_VAR_REGION: ${{ vars.AWS_REGION }}
-  TF_VAR_RDS_DEFAULT_USER: ${{ vars.AWS_RDS_DEFAULT_USER }}
-  TF_VAR_RDS_DEFAULT_PASS: ${{ vars.AWS_RDS_DEFAULT_PASS }}
   CLUSTER_NAME: t75-eks-cluster
 
 jobs:
