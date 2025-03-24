@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-svc-inventory
+  name: app-svc-client
 spec:
   type: ClusterIP
   selector:
-    app: app-ms-inventory
+    app: app-ms-client
   ports:
   - name: "http"
     port: 80
