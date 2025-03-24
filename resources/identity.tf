@@ -31,14 +31,14 @@ resource "aws_cognito_user_pool_client" "t75-user_pool_client" {
 }
 
 resource "aws_cognito_user_pool_domain" "t75-user_pool_domain" {
-  domain = "t75-app-identity-service"
+  domain = "vehicle-app-identity-service"
   user_pool_id = aws_cognito_user_pool.t75-user_pool.id
 }
 
 resource "aws_lambda_function" "t75-fn_identity" {
   function_name = "fn-identity"
   package_type = "Image"
-  image_uri = "${aws_ecr_repository.t75-ecr_ms_identity.repository_url}:latest"
+  image_uri = "${aws_ecr_repository.t75-ecr_ms_client.repository_url}:latest"
 
   role = "arn:aws:iam::${var.ACCOUNT_ID}:role/LabRole"
 
