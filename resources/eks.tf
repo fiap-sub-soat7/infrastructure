@@ -1,6 +1,6 @@
 resource "aws_eks_cluster" "t75-eks_cluster" {
   name = "t75-eks-cluster"
-  role_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/root"
+  role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
     subnet_ids = [aws_subnet.t75-vpc_subnet1.id, aws_subnet.t75-vpc_subnet2.id]
@@ -12,6 +12,11 @@ resource "aws_eks_cluster" "t75-eks_cluster" {
   access_config {
     authentication_mode = "API_AND_CONFIG_MAP"
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_cluster_policy,
+    aws_iam_role_policy_attachment.eks_service_policy
+  ]
 }
 
 resource "aws_eks_access_policy_association" "t75-eks_access_policy" {
