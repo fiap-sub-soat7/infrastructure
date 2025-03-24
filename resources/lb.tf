@@ -40,7 +40,7 @@ resource "aws_lb_listener" "t75-lb_listener" {
   protocol = "HTTP"
 
   default_action {
-    vehicle = 1
+    order = 1
     type = "fixed-response"
 
     fixed_response {
