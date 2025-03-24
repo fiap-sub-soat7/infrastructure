@@ -40,7 +40,7 @@ resource "aws_lambda_function" "t75-fn_identity" {
   package_type = "Image"
   image_uri = "${aws_ecr_repository.t75-ecr_ms_client.repository_url}:latest"
 
-  role = "arn:aws:iam::${var.ACCOUNT_ID}:role/LabRole"
+  role = "arn:aws:iam::${var.ACCOUNT_ID}:role/root"
 
   memory_size = 128
   timeout = 10

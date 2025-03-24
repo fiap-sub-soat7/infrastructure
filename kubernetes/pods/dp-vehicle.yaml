@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: ms-vehicle
-        image: AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/ms-vehicle:latest
+        image: AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/t75-ms-vehicle:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
