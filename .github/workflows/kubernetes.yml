@@ -21,7 +21,7 @@ jobs:
     - name: Checkout infrastructure
       uses: actions/checkout@v4
       with: 
-        ref: tcg-v4 # only to separate tech challenge versions
+        ref: main # only to separate tech challenge versions
 
     - name: Configure AWS user credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -49,9 +49,8 @@ jobs:
       run: |
         sed -i "s@AWS_ACCOUNT_ID@$AWS_ACCOUNT_ID@" kubernetes/service-account.yaml
 
-        sed -i "s@AWS_ACCOUNT_ID@$AWS_ACCOUNT_ID@" kubernetes/pods/dp-payment.yaml
+        sed -i "s@AWS_ACCOUNT_ID@$AWS_ACCOUNT_ID@" kubernetes/pods/dp-client.yaml
         sed -i "s@AWS_ACCOUNT_ID@$AWS_ACCOUNT_ID@" kubernetes/pods/dp-vehicle.yaml
-        sed -i "s@AWS_ACCOUNT_ID@$AWS_ACCOUNT_ID@" kubernetes/pods/dp-inventory.yaml
 
         encodedPass=$(base64 -w 0 <<< "${{ secrets.DB_SVC_URL }}")
         sed -i "s@DB_SVC_URL\:@& \"$encodedPass\"@" kubernetes/env/secrets.yaml

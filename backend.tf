@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "t75-app-resources"  
+    bucket = "vehicle-app-resources"  
     key = "terraform.tfstate"
 
     region = "us-east-1"

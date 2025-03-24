@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-client-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-ms-client
+  template:
+    metadata:
+      labels:
+        app: app-ms-client
+    spec:
+      containers:
+      - name: ms-client
+        image: AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/ms-client:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: app-config-client
+        env:
+        - name: DB_SVC_URL
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: DB_SVC_URL

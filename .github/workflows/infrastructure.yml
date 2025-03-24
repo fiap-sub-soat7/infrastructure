@@ -6,13 +6,11 @@ on:
     types: [opened, synchronize, closed]
   push: # IMPORTANT: only to tests
     branches:
-      - tcg-v4
+      - main
 
 env:
   TF_VAR_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
   TF_VAR_REGION: ${{ vars.AWS_REGION }}
-  TF_VAR_RDS_DEFAULT_USER: ${{ vars.AWS_RDS_DEFAULT_USER }}
-  TF_VAR_RDS_DEFAULT_PASS: ${{ vars.AWS_RDS_DEFAULT_PASS }}
   CLUSTER_NAME: t75-eks-cluster
 
 jobs:
@@ -25,7 +23,7 @@ jobs:
     - name: Checkout infrastructure
       uses: actions/checkout@v4
       with: 
-        ref: tcg-v4 # only to separate tech challenge versions
+        ref: main # only to separate tech challenge versions
 
     - name: Configure AWS user credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -36,7 +34,7 @@ jobs:
         aws-region: ${{ vars.AWS_REGION }}
     - name: Check s3 state bucket
       run: |
-        aws s3 mb s3://t75-app-resources
+        aws s3 mb s3://vehicle-app-resources
 
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v2

@@ -32,17 +32,11 @@ spec:
             name: app-svc-vehicle
             port:
               number: 80
-      - path: /payment/*
+      - path: /client/*
         pathType: Prefix
         backend:
           service:
-            name: app-svc-payment
+            name: app-svc-client
             port:
               number: 80
-      - path: /inventory/*
-        pathType: Prefix
-        backend:
-          service:
-            name: app-svc-inventory
-            port:
-              number: 80
+
