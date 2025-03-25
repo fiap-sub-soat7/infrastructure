@@ -13,16 +13,7 @@ resource "aws_api_gateway_method" "t75-ag_lg" {
   resource_id   = aws_api_gateway_resource.t75-ag_resouce_lb.id
   http_method   = "ANY"
 
-  authorizer_id = aws_api_gateway_authorizer.t75-cognito_authorizer.id
-  authorization = "COGNITO_USER_POOLS"
-}
-
-resource "aws_api_gateway_authorizer" "t75-cognito_authorizer" {
-  name             = "t75-cognito-authorizer"
-  rest_api_id      = aws_api_gateway_rest_api.t75-api_gateway.id
-  type             = "COGNITO_USER_POOLS"
-  provider_arns    = [aws_cognito_user_pool.t75-user_pool.arn]
-  identity_source  = "method.request.header.Authorization"
+  authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "t75-ag_lb_integration" {
@@ -56,9 +47,7 @@ resource "aws_api_gateway_deployment" "tg-ag_deployment" {
 
 
   depends_on = [ 
-    aws_api_gateway_method.t75-ag_fn_identity_post, 
     aws_api_gateway_method.t75-ag_lg,
     aws_api_gateway_integration.t75-ag_lb_integration,
-    aws_api_gateway_integration.t75-fn_api_integration
   ]
 }

@@ -21,17 +21,19 @@ resource "aws_eks_cluster" "t75-eks_cluster" {
 resource "aws_eks_access_policy_association" "t75-eks_access_policy" {
   cluster_name = aws_eks_cluster.t75-eks_cluster.name
   policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/voclabs"
+  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-cluster-role"
 
   access_scope {
     type = "cluster"
   }
+
+  depends_on = [aws_eks_access_entry.t75-eks_access_entry]
 }
 
 resource "aws_eks_node_group" "t75-eks-node_group" {
   cluster_name = aws_eks_cluster.t75-eks_cluster.name
   node_group_name = "t75-eks-node-group"
-  node_role_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/root"
+  node_role_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-node-role"
   subnet_ids = [aws_subnet.t75-vpc_subnet1.id, aws_subnet.t75-vpc_subnet2.id]
   instance_types = ["t3.medium"]
 
@@ -46,45 +48,24 @@ resource "aws_eks_node_group" "t75-eks-node_group" {
   update_config {
     max_unavailable = 1
   }
+
+  ami_type       = "AL2_x86_64"  # Explicit AMI type
+  capacity_type  = "ON_DEMAND"   # More reliable than SPOT for initial setup
+  disk_size      = 20            # Minimum recommended size
+
+  labels = {
+    role = "worker"
+  }
+
+  taint {
+    key    = "dedicated"
+    value  = "worker"
+    effect = "NO_SCHEDULE"
+  }
 }
 
 resource "aws_eks_access_entry" "t75-eks_access_entry" {
-  cluster_name = aws_eks_cluster.t75-eks_cluster.name
-  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/voclabs"
-  kubernetes_groups = [aws_eks_node_group.t75-eks-node_group.cluster_name]
-  type = "STANDARD"
+  cluster_name  = aws_eks_cluster.t75-eks_cluster.name
+  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-cluster-role"
+  type          = "STANDARD"  # Or "EC2_LINUX"/"EC2_WINDOWS" if it was auto-created
 }
-
-
-# resource "aws_eks_identity_provider_config" "t75-eks-oidc-config" {
-#   cluster_name = aws_eks_cluster.t75-eks_cluster.name
-#   oidc {
-#     client_id = "sts.amazonaws.com"
-#     identity_provider_config_name = "t75-eks-oidc"
-#     issuer_url = aws_eks_cluster.t75-eks_cluster.identity[0].oidc[0].issuer
-#   }
-# }
-
-# resource "aws_eks_pod_identity_association" "t75-eks_pod_role" {
-#   role_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/eks-service-account-role"
-#   namespace = "kube-system"
-#   service_account = "t75-sa-eks-ec2"
-#   cluster_name = aws_eks_cluster.t75-eks_cluster.name 
-  
-#   # depends_on = [kubernetes_service_account.t75-sa_eks_ec2]
-# }
-
-# resource "kubernetes_service_account" "t75-sa_eks_ec2" {
-#   metadata {
-#     name = "t75-sa-eks-ec2"
-#     namespace = "kube-system"
-#     annotations = {
-#       "eks.amazonaws.com/role-arn" = "arn:aws:iam::${var.ACCOUNT_ID}:role/eks-service-account-role"
-#     }
-#   }
-# }
-
-# resource "aws_eks_addon" "t75-eks_pod_identity" {
-#   cluster_name = aws_eks_cluster.t75-eks_cluster.name
-#   addon_name = "eks-pod-identity-webhook"
-# }
