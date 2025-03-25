@@ -61,6 +61,7 @@ jobs:
         
     - name: Create Kubernetes ServiceAccount - ALB
       run: |
+        aws eks update-kubeconfig --name $CLUSTER_NAME --region ${{ vars.AWS_REGION }}
         kubectl apply -f ./kubernetes/service-account.yaml \
           -n kube-system
 
