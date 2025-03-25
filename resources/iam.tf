@@ -63,19 +63,18 @@ resource "aws_iam_role" "eks_serviceaccount_role" {
       {
         Effect = "Allow",
         Principal = {
-          Federated = "arn:aws:iam::${var.ACCOUNT_ID}:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/D1473724FC15261F3A55816197A26D67"
+          Federated = aws_iam_openid_connect_provider.eks_oidc.arn
         },
         Action = "sts:AssumeRoleWithWebIdentity",
         Condition = {
           StringEquals = {
-            "oidc.eks.us-east-1.amazonaws.com/id/D1473724FC15261F3A55816197A26D67:sub" = "system:serviceaccount:default:t75-sa-eks-ec2"
+            "${replace(aws_eks_cluster.t75-eks_cluster.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:default:t75-sa-eks-ec2"
           }
         }
       }
     ]
   })
 }
-
 # Adicione políticas necessárias (exemplo: S3 read-only)
 resource "aws_iam_role_policy_attachment" "s3_read_only" {
   role       = aws_iam_role.eks_serviceaccount_role.name

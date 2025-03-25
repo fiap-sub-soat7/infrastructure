@@ -29,10 +29,13 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET }}
         aws-region: ${{ vars.AWS_REGION }}
+        role-to-assume: arn:aws:iam::${AWS_ACCOUNT_ID}:role/t75-eks-cluster-role
+        role-session-name: GitHubActionsSession
 
     - name: Configure EKS AWS
       run: |
-        aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+        aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION \
+          --role-arn arn:aws:iam::${AWS_ACCOUNT_ID}:role/t75-eks-cluster-role
     
     - name: Process envs
       run: |
@@ -59,9 +62,10 @@ jobs:
         sed -i "s@\/load-balancer-arn\:@& $AWS_LB_ARN@" kubernetes/ingress.yaml
         sed -i "s@AWS_LB_NAME@$AWS_LB_NAME@" kubernetes/ingress.yaml
         
-    # - name: Create Kubernetes ServiceAccount - ALB
-    #   run: |
-    #     kubectl apply -f ./kubernetes/service-account.yaml 
+    - name: Create Kubernetes ServiceAccount - ALB
+      run: |
+        kubectl apply -f ./kubernetes/service-account.yaml \
+          -n kube-system
 
     - name: Install Helm
       run: |
