@@ -55,7 +55,7 @@ resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
 }
 
 locals {
-  oidc_provider = replace(aws_eks_cluster.t75_cluster.identity[0].oidc[0].issuer, "https://", "")
+  oidc_provider = replace(aws_eks_cluster.t75-eks-cluster.identity[0].oidc[0].issuer, "https://", "")
 }
 
 resource "aws_iam_role" "eks_serviceaccount_role" {
