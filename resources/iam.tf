@@ -54,10 +54,6 @@ resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
-locals {
-  oidc_provider = replace(aws_eks_cluster.t75-eks-cluster.identity[0].oidc[0].issuer, "https://", "")
-}
-
 resource "aws_iam_role" "eks_serviceaccount_role" {
   name = "t75-eks-serviceaccount-role"
 
@@ -67,12 +63,12 @@ resource "aws_iam_role" "eks_serviceaccount_role" {
       {
         Effect = "Allow",
         Principal = {
-          Federated = "arn:aws:iam::${var.ACCOUNT_ID}:oidc-provider/${local.oidc_provider}"
+          Federated = "arn:aws:iam::${var.ACCOUNT_ID}:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/D1473724FC15261F3A55816197A26D67"
         },
         Action = "sts:AssumeRoleWithWebIdentity",
         Condition = {
           StringEquals = {
-            "${local.oidc_provider}:sub" = "system:serviceaccount:default:t75-sa-eks-ec2"
+            "oidc.eks.us-east-1.amazonaws.com/id/D1473724FC15261F3A55816197A26D67:sub" = "system:serviceaccount:default:t75-sa-eks-ec2"
           }
         }
       }
