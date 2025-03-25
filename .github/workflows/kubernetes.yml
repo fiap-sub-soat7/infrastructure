@@ -59,11 +59,9 @@ jobs:
         sed -i "s@\/load-balancer-arn\:@& $AWS_LB_ARN@" kubernetes/ingress.yaml
         sed -i "s@AWS_LB_NAME@$AWS_LB_NAME@" kubernetes/ingress.yaml
         
-    - name: Create Kubernetes ServiceAccount - ALB
-      run: |
-        aws eks update-kubeconfig --name $CLUSTER_NAME --region ${{ vars.AWS_REGION }}
-        kubectl apply -f ./kubernetes/service-account.yaml \
-          -n kube-system
+    # - name: Create Kubernetes ServiceAccount - ALB
+    #   run: |
+    #     kubectl apply -f ./kubernetes/service-account.yaml 
 
     - name: Install Helm
       run: |
