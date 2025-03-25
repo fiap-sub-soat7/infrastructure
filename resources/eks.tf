@@ -69,3 +69,13 @@ resource "aws_eks_access_entry" "t75-eks_access_entry" {
   principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-cluster-role"
   type          = "STANDARD"  # Or "EC2_LINUX"/"EC2_WINDOWS" if it was auto-created
 }
+
+data "tls_certificate" "eks_oidc" {
+  url = aws_eks_cluster.t75-eks_cluster.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks_oidc" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks_oidc.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.t75-eks_cluster.identity[0].oidc[0].issuer
+}

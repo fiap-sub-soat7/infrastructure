@@ -53,3 +53,35 @@ resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
   role       = aws_iam_role.eks_node_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
+
+locals {
+  oidc_provider = replace(aws_eks_cluster.t75_cluster.identity[0].oidc[0].issuer, "https://", "")
+}
+
+resource "aws_iam_role" "eks_serviceaccount_role" {
+  name = "t75-eks-serviceaccount-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Federated = "arn:aws:iam::${var.ACCOUNT_ID}:oidc-provider/${local.oidc_provider}"
+        },
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Condition = {
+          StringEquals = {
+            "${local.oidc_provider}:sub" = "system:serviceaccount:default:t75-sa-eks-ec2"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# Adicione políticas necessárias (exemplo: S3 read-only)
+resource "aws_iam_role_policy_attachment" "s3_read_only" {
+  role       = aws_iam_role.eks_serviceaccount_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+}
