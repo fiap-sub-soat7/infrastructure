@@ -35,14 +35,7 @@ jobs:
 
     - name: Configure EKS AWS
       run: |
-        aws sts get-caller-identity
-        
-        aws eks update-kubeconfig \
-          --name $CLUSTER_NAME \
-          --region $AWS_REGION \
-          --role-arn arn:aws:iam::025066260361:role/t75-eks-serviceaccount-role
-
-        kubectl get ns
+        aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
     
     - name: Process envs
       run: |
