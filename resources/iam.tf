@@ -77,12 +77,6 @@ resource "aws_iam_role" "eks_serviceaccount_role" {
   })
 }
 
-# Required policies for ALB Controller
-resource "aws_iam_role_policy_attachment" "alb_controller" {
-  role       = aws_iam_role.eks_serviceaccount_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSLoadBalancerControllerIAMPolicy"
-}
-
 resource "aws_iam_role_policy_attachment" "s3_read_only" {
   role       = aws_iam_role.eks_serviceaccount_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
