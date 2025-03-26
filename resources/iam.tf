@@ -70,7 +70,7 @@ resource "aws_iam_role" "eks_serviceaccount_role" {
           "sts:AssumeRole",
           "sts:TagSession"
         ]
-      }
+      },
       {
         Effect = "Allow",
         Principal = {
