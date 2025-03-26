@@ -36,13 +36,6 @@ jobs:
     - name: Configure EKS AWS
       run: |
         aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
-
-        aws eks update-kubeconfig \
-          --name $CLUSTER_NAME \
-          --region $AWS_REGION \
-          --alias eks \
-          --role-arn arn:aws:iam::025066260361:role/t75-eks-serviceaccount-role
-
         kubectl config view
         kubectl get ns
       
