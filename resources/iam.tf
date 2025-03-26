@@ -54,6 +54,7 @@ resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
+# Service Account Role for ALB Controller
 resource "aws_iam_role" "eks_serviceaccount_role" {
   name = "t75-eks-serviceaccount-role"
 
@@ -68,15 +69,27 @@ resource "aws_iam_role" "eks_serviceaccount_role" {
         Action = "sts:AssumeRoleWithWebIdentity",
         Condition = {
           StringEquals = {
-            "${replace(aws_eks_cluster.t75-eks_cluster.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:default:t75-sa-eks-ec2"
+            "${replace(aws_eks_cluster.t75-eks_cluster.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:kube-system:t75-sa-eks-ec2"
           }
         }
       }
     ]
   })
 }
-# Adicione políticas necessárias (exemplo: S3 read-only)
+
+# Required policies for ALB Controller
+resource "aws_iam_role_policy_attachment" "alb_controller" {
+  role       = aws_iam_role.eks_serviceaccount_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSLoadBalancerControllerIAMPolicy"
+}
+
 resource "aws_iam_role_policy_attachment" "s3_read_only" {
   role       = aws_iam_role.eks_serviceaccount_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+}
+
+# Additional policies that might be needed
+resource "aws_iam_role_policy_attachment" "eks_serviceaccount_ecr" {
+  role       = aws_iam_role.eks_serviceaccount_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }

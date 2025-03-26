@@ -32,7 +32,10 @@ jobs:
 
     - name: Configure EKS AWS
       run: |
-        aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+        aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/t75-eks-serviceaccount-role
+    
+    - name: Verify kubectl access
+      run: kubectl get nodes
     
     - name: Process envs
       run: |
