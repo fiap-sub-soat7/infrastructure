@@ -21,7 +21,7 @@ jobs:
     - name: Checkout infrastructure
       uses: actions/checkout@v4
       with: 
-        ref: main # only to separate tech challenge versions
+        ref: main
 
     - name: Configure AWS user credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -32,9 +32,6 @@ jobs:
 
     - name: Configure EKS AWS
       run: |
-        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
-        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET }}
-        aws configure set region ${{ vars.AWS_REGION }}
         aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
     
     - name: Process envs
@@ -62,6 +59,11 @@ jobs:
         sed -i "s@\/load-balancer-arn\:@& $AWS_LB_ARN@" kubernetes/ingress.yaml
         sed -i "s@AWS_LB_NAME@$AWS_LB_NAME@" kubernetes/ingress.yaml
         
+    - name: Create Kubernetes ServiceAccount - ALB
+      run: |
+        kubectl apply -f ./kubernetes/service-account.yaml \
+          -n kube-system
+
     - name: Install Helm
       run: |
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
