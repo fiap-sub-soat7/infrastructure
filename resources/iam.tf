@@ -64,6 +64,13 @@ resource "aws_iam_role" "eks_serviceaccount_role" {
       {
         Effect = "Allow",
         Principal = {
+          AWS = "arn:aws:iam::025066260361:user/github-actions-user"
+        },
+        Action = "sts:AssumeRole"
+      },
+      {
+        Effect = "Allow",
+        Principal = {
           Federated = aws_iam_openid_connect_provider.eks_oidc.arn
         },
         Action = "sts:AssumeRoleWithWebIdentity",
@@ -72,13 +79,6 @@ resource "aws_iam_role" "eks_serviceaccount_role" {
             "${aws_iam_openid_connect_provider.eks_oidc.url}:sub" = "system:serviceaccount:kube-system:t75-sa-eks-ec2"
           }
         }
-      },
-      {
-        Effect = "Allow",
-        Principal = {
-          AWS = "arn:aws:iam::025066260361:user/github-actions-user"
-        },
-        Action = "sts:AssumeRole"
       }
     ]
   })
@@ -101,7 +101,7 @@ resource "aws_iam_role_policy_attachment" "eks_serviceaccount_ec2" {
 }
 
 resource "aws_iam_user_policy" "github_actions_assume_role" {
-  name = "GitHubActionsAssumeRolePolicy"
+  name = "GitHubActionsAssumeRole"
   user = "github-actions-user"
 
   policy = jsonencode({
