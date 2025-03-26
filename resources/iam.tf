@@ -66,8 +66,11 @@ resource "aws_iam_role" "eks_serviceaccount_role" {
         Principal = {
           AWS = "arn:aws:iam::025066260361:user/github-actions-user"
         },
-        Action = "sts:AssumeRole"
-      },
+        Action = [
+          "sts:AssumeRole",
+          "sts:TagSession"
+        ]
+      }
       {
         Effect = "Allow",
         Principal = {
