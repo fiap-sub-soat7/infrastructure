@@ -103,6 +103,11 @@ resource "aws_iam_role_policy_attachment" "eks_serviceaccount_ec2" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
 }
 
+resource "aws_iam_role_policy_attachment" "eks_read_only" {
+  role       = aws_iam_role.eks_serviceaccount_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSReadOnlyAccess"
+}
+
 resource "aws_iam_user_policy" "github_actions_assume_role" {
   name = "GitHubActionsAssumeRole"
   user = "github-actions-user"
