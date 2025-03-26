@@ -97,5 +97,10 @@ resource "aws_iam_role_policy_attachment" "eks_serviceaccount_ecr" {
 
 resource "aws_iam_role_policy_attachment" "alb_controller" {
   role       = aws_iam_role.eks_serviceaccount_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSLoadBalancerControllerIAMPolicy"
+  policy_arn = "arn:aws:iam::aws:policy/AWSLoadBalancerController_v2"
+}
+
+resource "aws_iam_role_policy_attachment" "eks_serviceaccount_ec2" {
+  role       = aws_iam_role.eks_serviceaccount_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
 }
