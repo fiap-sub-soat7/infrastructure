@@ -103,9 +103,26 @@ resource "aws_iam_role_policy_attachment" "eks_serviceaccount_ec2" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "eks_read_only" {
+resource "aws_iam_policy" "eks_describe" {
+  name        = "eks-describe-cluster"
+  description = "Minimal EKS describe permissions"
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect   = "Allow",
+      Action   = [
+        "eks:DescribeCluster",
+        "eks:ListClusters"
+      ],
+      Resource = "arn:aws:eks:us-east-1:025066260361:cluster/t75-eks-cluster"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eks_describe" {
   role       = aws_iam_role.eks_serviceaccount_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSReadOnlyAccess"
+  policy_arn = aws_iam_policy.eks_describe.arn
 }
 
 resource "aws_iam_user_policy" "github_actions_assume_role" {
