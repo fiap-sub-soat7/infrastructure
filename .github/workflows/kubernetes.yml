@@ -34,9 +34,6 @@ jobs:
       run: |
         aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/t75-eks-serviceaccount-role
     
-    - name: Verify kubectl access
-      run: kubectl get nodes
-    
     - name: Process envs
       run: |
         echo "AWS_SUBNET_IDS=$(aws ec2 describe-subnets --query "Subnets[*].SubnetId" --output text --filter "Name=tag:Name,Values=t75*" | tr '\t' ', ')" >> $GITHUB_ENV
