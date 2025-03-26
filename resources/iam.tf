@@ -94,3 +94,8 @@ resource "aws_iam_role_policy_attachment" "eks_serviceaccount_ecr" {
   role       = aws_iam_role.eks_serviceaccount_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
+
+resource "aws_iam_role_policy_attachment" "alb_controller" {
+  role       = aws_iam_role.eks_serviceaccount_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSLoadBalancerControllerIAMPolicy"
+}

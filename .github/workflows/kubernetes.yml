@@ -29,10 +29,12 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_GIT_ACCESS_KEY }}
         aws-secret-access-key: ${{ secrets.AWS_GIT_SECRET }}
         aws-region: ${{ vars.AWS_REGION }}
+        role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/t75-eks-serviceaccount-role
+        role-session-name: GitHubActionsSession
 
     - name: Configure EKS AWS
       run: |
-        aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/t75-eks-serviceaccount-role
+        aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
     
     - name: Process envs
       run: |
