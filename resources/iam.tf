@@ -113,3 +113,43 @@ resource "aws_iam_user_policy" "github_actions_assume_role" {
     }]
   })
 }
+
+resource "aws_iam_user_policy" "github_actions_eks_access" {
+  name = "GitHubActionsEKSAccess"
+  user = "github-actions-user"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "eks:DescribeCluster",
+          "eks:ListClusters"
+        ],
+        Resource = "arn:aws:eks:us-east-1:025066260361:cluster/t75-eks-cluster"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_user_policy" "github_actions_full_eks_access" {
+  name = "GitHubActionsFullEKSAccess"
+  user = "github-actions-user"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "eks:*",
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow",
+        Action   = "iam:PassRole",
+        Resource = "arn:aws:iam::025066260361:role/t75-eks-serviceaccount-role"
+      }
+    ]
+  })
+}
