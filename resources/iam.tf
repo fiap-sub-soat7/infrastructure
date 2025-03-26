@@ -69,7 +69,7 @@ resource "aws_iam_role" "eks_serviceaccount_role" {
         Action = "sts:AssumeRoleWithWebIdentity",
         Condition = {
           StringEquals = {
-            "${replace(aws_eks_cluster.t75-eks_cluster.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:kube-system:t75-sa-eks-ec2"
+            "${aws_iam_openid_connect_provider.eks_oidc.url}:sub" = "system:serviceaccount:kube-system:t75-sa-eks-ec2"
           }
         }
       },
@@ -78,10 +78,7 @@ resource "aws_iam_role" "eks_serviceaccount_role" {
         Principal = {
           AWS = "arn:aws:iam::025066260361:user/github-actions-user"
         },
-        Action = [
-          "sts:AssumeRole",
-          "sts:TagSession"
-        ]
+        Action = "sts:AssumeRole"
       }
     ]
   })
@@ -101,4 +98,18 @@ resource "aws_iam_role_policy_attachment" "eks_serviceaccount_ecr" {
 resource "aws_iam_role_policy_attachment" "eks_serviceaccount_ec2" {
   role       = aws_iam_role.eks_serviceaccount_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+}
+
+resource "aws_iam_user_policy" "github_actions_assume_role" {
+  name = "GitHubActionsAssumeRolePolicy"
+  user = "github-actions-user"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect   = "Allow",
+      Action   = "sts:AssumeRole",
+      Resource = "arn:aws:iam::025066260361:role/t75-eks-serviceaccount-role"
+    }]
+  })
 }
