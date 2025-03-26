@@ -72,6 +72,13 @@ resource "aws_iam_role" "eks_serviceaccount_role" {
             "${replace(aws_eks_cluster.t75-eks_cluster.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:kube-system:t75-sa-eks-ec2"
           }
         }
+      },
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "arn:aws:iam::025066260361:user/github-actions-user"
+        },
+        "Action": "sts:AssumeRole"
       }
     ]
   })
