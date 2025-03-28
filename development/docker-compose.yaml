@@ -31,9 +31,9 @@ services:
       - NODE_ENV=development
       - TZ=America/Sao_Paulo
     env_file:
-      - vehicle/.env.sample
+      - ms-vehicle/.env.sample
     volumes:
-      - ./vehicle:/app
+      - ./ms-vehicle:/app
       - /app/node_modules/
     networks:
       - soat7-network
@@ -57,9 +57,9 @@ services:
       - NODE_ENV=development
       - TZ=America/Sao_Paulo
     env_file:
-      - client/.env.sample
+      - ms-client/.env.sample
     volumes:
-      - ./client:/app
+      - ./ms-client:/app
       - /app/node_modules/
     networks:
       - soat7-network

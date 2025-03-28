@@ -9,8 +9,8 @@ on:
       - main
 
 env:
-  TF_VAR_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
-  TF_VAR_REGION: ${{ vars.AWS_REGION }}
+  TF_VAR_ACCOUNT_ID: ${{ vars.AWS_GIT_ACCESS_KEY }}
+  TF_VAR_REGION: ${{ vars.AWS_GIT_SECRET }}
   CLUSTER_NAME: t75-eks-cluster
 
 jobs:

@@ -12,9 +12,9 @@ on:
         required: false
         type: boolean
     secrets:
-      AWS_ACCESS_KEY: 
+      AWS_GIT_ACCESS_KEY: 
         required: true
-      AWS_SECRET: 
+      AWS_GIT_SECRET: 
         required: true
 
 
@@ -28,8 +28,8 @@ jobs:
       - name: Configure AWS user credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET }}
+          aws-access-key-id: ${{ secrets.AWS_GIT_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_GIT_SECRET }}
           aws-region: ${{ inputs.AWS_REGION }}
         
       - name: Amazon ECR - Image Registry login
