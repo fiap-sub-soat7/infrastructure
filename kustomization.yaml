@@ -1,12 +1,12 @@
 resources:
-  - ./kubernetes/namespace.yaml 
-  - ./kubernetes/env/secrets.yaml
-  - ./kubernetes/env/cm-client.yaml
-  - ./kubernetes/env/cm-vehicle.yaml
-  - ./kubernetes/pods/dp-client.yaml
-  - ./kubernetes/pods/dp-vehicle.yaml
-  - ./kubernetes/services/svc-client.yaml
-  - ./kubernetes/services/svc-vehicle.yaml
-  - ./kubernetes/hpa/hpa-vehicle.yaml
-  - ./kubernetes/ingress.yaml
-  - ./kubernetes/proxy.yaml
+  # - ./kubernetes/namespace.yaml 
+  # - ./kubernetes/env/secrets.yaml
+  # - ./kubernetes/env/cm-client.yaml
+  # - ./kubernetes/env/cm-vehicle.yaml
+  # - ./kubernetes/pods/dp-client.yaml
+  # - ./kubernetes/pods/dp-vehicle.yaml
+  # - ./kubernetes/services/svc-client.yaml
+  # - ./kubernetes/services/svc-vehicle.yaml
+  # - ./kubernetes/hpa/hpa-vehicle.yaml
+  # - ./kubernetes/ingress.yaml
+  # - ./kubernetes/proxy.yaml
