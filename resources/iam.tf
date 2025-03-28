@@ -129,60 +129,6 @@ resource "aws_iam_role_policy_attachment" "eks_describe" {
   policy_arn = aws_iam_policy.eks_full_access.arn
 }
 
-#resource "aws_iam_user_policy" "github_actions_assume_role" {
-#  name = "GitHubActionsAssumeRole"
-#  user = "github-actions-user"
-#
-#  policy = jsonencode({
-#    Version = "2012-10-17",
-#    Statement = [{
-#      Effect   = "Allow",
-#      Action   = "sts:AssumeRole",
-#      Resource = "arn:aws:iam::025066260361:role/t75-eks-serviceaccount-role"
-#    }]
-#  })
-#}
-#
-#resource "aws_iam_user_policy" "github_actions_eks_access" {
-#  name = "GitHubActionsEKSAccess"
-#  user = "github-actions-user"
-#
-#  policy = jsonencode({
-#    Version = "2012-10-17",
-#    Statement = [
-#      {
-#        Effect   = "Allow",
-#        Action   = [
-#          "eks:DescribeCluster",
-#          "eks:ListClusters"
-#        ],
-#        Resource = "arn:aws:eks:us-east-1:025066260361:cluster/t75-eks-cluster"
-#      }
-#    ]
-#  })
-#}
-#
-#resource "aws_iam_user_policy" "github_actions_full_eks_access" {
-#  name = "GitHubActionsFullEKSAccess"
-#  user = "github-actions-user"
-#
-#  policy = jsonencode({
-#    Version = "2012-10-17",
-#    Statement = [
-#      {
-#        Effect   = "Allow",
-#        Action   = "eks:*",
-#        Resource = "*"
-#      },
-#      {
-#        Effect   = "Allow",
-#        Action   = "iam:PassRole",
-#        Resource = "arn:aws:iam::025066260361:role/t75-eks-serviceaccount-role"
-#      }
-#    ]
-#  })
-#}
-
 resource "aws_iam_policy" "alb_controller_policy" {
   name        = "ALBControllerPolicy"
   description = "Permissions for AWS Load Balancer Controller"
@@ -254,3 +200,7 @@ resource "aws_eks_access_entry" "github_actions_user_access_entry" {
   type          = "STANDARD"
 }
 
+resource "aws_iam_user_policy_attachment" "github_actions_eks_access" {
+  user       = "github-actions-user"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+}
