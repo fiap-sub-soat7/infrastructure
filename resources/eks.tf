@@ -27,7 +27,7 @@ resource "aws_eks_access_policy_association" "t75-eks_access_policy" {
     type = "cluster"
   }
 
-  depends_on = [aws_eks_access_entry.t75-eks_access_entry]
+  depends_on = [aws_eks_access_entry.github_actions_user_access_entry]
 }
 
 resource "aws_eks_node_group" "t75-eks-node_group" {
