@@ -15,9 +15,7 @@ resource "aws_subnet" "t75-vpc_subnet1" {
   map_public_ip_on_launch = true
 
   tags = {
-     Name = "t75-vpc_subnet1",
-    "kubernetes.io/cluster/t75-eks-cluster" = "shared",
-    "kubernetes.io/role/elb" = "1"
+     Name = "t75-vpc_subnet1"
   }
 }
 
@@ -28,9 +26,7 @@ resource "aws_subnet" "t75-vpc_subnet2" {
   map_public_ip_on_launch = true
 
   tags = {
-     Name = "t75-vpc_subnet2",
-    "kubernetes.io/cluster/t75-eks-cluster" = "shared",
-    "kubernetes.io/role/elb" = "1"
+     Name = "t75-vpc_subnet2"
   }
 }
 

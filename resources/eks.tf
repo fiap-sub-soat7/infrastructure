@@ -5,21 +5,39 @@ resource "aws_eks_cluster" "t75-eks_cluster" {
   vpc_config {
     subnet_ids = [aws_subnet.t75-vpc_subnet1.id, aws_subnet.t75-vpc_subnet2.id]
     security_group_ids = [aws_security_group.t75-sg.id]
+    # cluster_security_group_id = aws_security_group.t75-sg.id
     endpoint_public_access = true
-    public_access_cidrs    = ["0.0.0.0/0"]
   }
 
   access_config {
     authentication_mode = "API_AND_CONFIG_MAP"
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_cluster_policy,
+  ]
+}
+
+resource "aws_eks_access_policy_association" "t75-eks_access_policy" {
+  cluster_name = aws_eks_cluster.t75-eks_cluster.name
+  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-cluster-role"
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [aws_eks_access_entry.t75-eks_access_entry]
 }
 
 resource "aws_eks_node_group" "t75-eks-node_group" {
   cluster_name = aws_eks_cluster.t75-eks_cluster.name
   node_group_name = "t75-eks-node-group"
-  node_role_arn = aws_iam_role.eks_node_group.arn
+  node_role_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-node-role"
   subnet_ids = [aws_subnet.t75-vpc_subnet1.id, aws_subnet.t75-vpc_subnet2.id]
   instance_types = ["t3.medium"]
+
+  depends_on = [aws_eks_cluster.t75-eks_cluster]
 
   scaling_config {
     desired_size = 1
@@ -31,77 +49,33 @@ resource "aws_eks_node_group" "t75-eks-node_group" {
     max_unavailable = 1
   }
 
-  depends_on = [
-    aws_iam_role_policy_attachment.eks_worker_node_policy,
-    aws_iam_role_policy_attachment.eks_cni_policy,
-    aws_iam_role_policy_attachment.ec2_container_registry_readonly,
-    aws_eks_cluster.t75-eks_cluster 
-  ]
-}
+  ami_type       = "AL2_x86_64"  # Explicit AMI type
+  capacity_type  = "ON_DEMAND"   # More reliable than SPOT for initial setup
+  disk_size      = 20            # Minimum recommended size
 
-# 1. Create the IAM role
-# EKS Cluster Role (for the control plane)
-resource "aws_iam_role" "eks_cluster_role" {
-  name = "t75-eks-cluster-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Action = "sts:AssumeRole",
-        Effect = "Allow",
-        Principal = {
-          Service = "eks.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-# 2. Create the access entry
-resource "aws_eks_access_entry" "t75_eks_access_entry" {
-  cluster_name  = aws_eks_cluster.t75-eks_cluster.name
-  principal_arn = aws_iam_role.eks_cluster_role.arn
-}
-
-resource "aws_eks_access_policy_association" "t75-eks_access_policy" {
-  cluster_name = aws_eks_cluster.t75-eks_cluster.name
-  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-  principal_arn = aws_iam_role.eks_cluster_role.arn
-
-  access_scope {
-    type = "cluster"
+  labels = {
+    role = "worker"
   }
 
-  depends_on = [aws_eks_access_entry.t75_eks_access_entry]
+  taint {
+    key    = "dedicated"
+    value  = "worker"
+    effect = "NO_SCHEDULE"
+  }
 }
 
-resource "aws_iam_role" "eks_node_group" {
-  name = "eks-node-group-role"
-
-  assume_role_policy = jsonencode({
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "ec2.amazonaws.com"
-      }
-    }]
-    Version = "2012-10-17"
-  })
+resource "aws_eks_access_entry" "t75-eks_access_entry" {
+  cluster_name  = aws_eks_cluster.t75-eks_cluster.name
+  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-cluster-role"
+  type          = "STANDARD"  # Or "EC2_LINUX"/"EC2_WINDOWS" if it was auto-created
 }
 
-resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = aws_iam_role.eks_node_group.name
+data "tls_certificate" "eks_oidc" {
+  url = aws_eks_cluster.t75-eks_cluster.identity[0].oidc[0].issuer
 }
 
-resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.eks_node_group.name
-}
-
-resource "aws_iam_role_policy_attachment" "ec2_container_registry_readonly" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.eks_node_group.name
+resource "aws_iam_openid_connect_provider" "eks_oidc" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks_oidc.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.t75-eks_cluster.identity[0].oidc[0].issuer
 }
