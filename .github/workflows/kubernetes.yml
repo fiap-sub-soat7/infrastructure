@@ -61,6 +61,14 @@ jobs:
         
     - name: Create Kubernetes ServiceAccount - ALB
       run: |
+        kubectl create clusterrole github-actions-role \
+        --verb=get,list,watch,create,update,patch \
+        --resource=serviceaccounts
+
+        kubectl create clusterrolebinding github-actions-binding \
+        --clusterrole=github-actions-role \
+        --user="arn:aws:iam::025066260361:user/github-actions-user"
+
         kubectl apply -f ./kubernetes/service-account.yaml \
           -n kube-system
 
