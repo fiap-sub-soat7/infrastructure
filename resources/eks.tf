@@ -21,8 +21,6 @@ resource "aws_eks_node_group" "t75-eks-node_group" {
   subnet_ids = [aws_subnet.t75-vpc_subnet1.id, aws_subnet.t75-vpc_subnet2.id]
   instance_types = ["t3.medium"]
 
-  depends_on = [aws_eks_cluster.t75-eks_cluster]
-
   scaling_config {
     desired_size = 1
     max_size = 2
