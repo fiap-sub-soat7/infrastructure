@@ -33,7 +33,7 @@ resource "aws_eks_access_policy_association" "t75-eks_access_policy" {
 resource "aws_eks_node_group" "t75-eks-node_group" {
   cluster_name = aws_eks_cluster.t75-eks_cluster.name
   node_group_name = "t75-eks-node-group"
-  node_role_arn = aws_iam_role.eks_node_role.arn
+  node_role_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-node-role"
   subnet_ids = [aws_subnet.t75-vpc_subnet1.id, aws_subnet.t75-vpc_subnet2.id]
   instance_types = ["t3.medium"]
 
@@ -66,7 +66,7 @@ resource "aws_eks_node_group" "t75-eks-node_group" {
 
 resource "aws_eks_access_entry" "t75-eks_access_entry" {
   cluster_name  = aws_eks_cluster.t75-eks_cluster.name
-  principal_arn = "arn:aws:iam::025066260361:user/github-actions-user"
+  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-cluster-role"
   type          = "STANDARD"
 }
 
