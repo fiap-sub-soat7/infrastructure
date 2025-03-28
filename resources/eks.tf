@@ -5,8 +5,8 @@ resource "aws_eks_cluster" "t75-eks_cluster" {
   vpc_config {
     subnet_ids = [aws_subnet.t75-vpc_subnet1.id, aws_subnet.t75-vpc_subnet2.id]
     security_group_ids = [aws_security_group.t75-sg.id]
-    # cluster_security_group_id = aws_security_group.t75-sg.id
     endpoint_public_access = true
+    public_access_cidrs    = ["0.0.0.0/0"]
   }
 
   access_config {
