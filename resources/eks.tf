@@ -30,6 +30,21 @@ resource "aws_eks_access_policy_association" "t75-eks_access_policy" {
   depends_on = [aws_eks_access_entry.t75-eks_access_entry]
 }
 
+resource "aws_iam_role" "eks_node_group" {
+  name = "eks-node-group-role"
+
+  assume_role_policy = jsonencode({
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+    }]
+    Version = "2012-10-17"
+  })
+}
+
 resource "aws_eks_node_group" "t75-eks-node_group" {
   cluster_name = aws_eks_cluster.t75-eks_cluster.name
   node_group_name = "t75-eks-node-group"
@@ -66,7 +81,7 @@ resource "aws_eks_node_group" "t75-eks-node_group" {
 
 resource "aws_eks_access_entry" "t75-eks_access_entry" {
   cluster_name  = aws_eks_cluster.t75-eks_cluster.name
-  principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/t75-eks-cluster-role"
+  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-cluster-role"
   type          = "STANDARD"  # Or "EC2_LINUX"/"EC2_WINDOWS" if it was auto-created
 }
 
