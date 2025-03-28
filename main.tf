@@ -1,6 +1,6 @@
 module "t75-app" {
   source = "./resources"
-  ACCOUNT_ID = var.ACCOUNT_ID
+  ACCOUNT_ID = var.AWS_ACCOUNT_ID
   REGION = var.REGION
 }
 
