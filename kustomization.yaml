@@ -1,19 +1,12 @@
 resources:
   - ./kubernetes/namespace.yaml 
-  # - ./kubernetes/service-account.yaml
   - ./kubernetes/env/secrets.yaml
-  - ./kubernetes/env/cm-inventory.yaml
+  - ./kubernetes/env/cm-client.yaml
   - ./kubernetes/env/cm-vehicle.yaml
-  - ./kubernetes/env/cm-payment.yaml
-  - ./kubernetes/pods/dp-inventory.yaml
+  - ./kubernetes/pods/dp-client.yaml
   - ./kubernetes/pods/dp-vehicle.yaml
-  - ./kubernetes/pods/dp-payment.yaml
-  - ./kubernetes/services/svc-inventory.yaml
+  - ./kubernetes/services/svc-client.yaml
   - ./kubernetes/services/svc-vehicle.yaml
-  - ./kubernetes/services/svc-payment.yaml
-  - ./kubernetes/hpa/hpa-inventory.yaml
   - ./kubernetes/hpa/hpa-vehicle.yaml
-  - ./kubernetes/hpa/hpa-payment.yaml
   - ./kubernetes/ingress.yaml
   - ./kubernetes/proxy.yaml
-  # - ./kubernetes/load-balancer.yaml
