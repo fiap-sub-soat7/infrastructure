@@ -64,12 +64,6 @@ resource "aws_eks_node_group" "t75-eks-node_group" {
   }
 }
 
-resource "aws_eks_access_entry" "t75-eks_access_entry" {
-  cluster_name  = aws_eks_cluster.t75-eks_cluster.name
-  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-cluster-role"
-  type          = "STANDARD"
-}
-
 data "tls_certificate" "eks_oidc" {
   url = aws_eks_cluster.t75-eks_cluster.identity[0].oidc[0].issuer
 }
