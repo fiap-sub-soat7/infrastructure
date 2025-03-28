@@ -61,6 +61,8 @@ jobs:
         
     - name: Create Kubernetes ServiceAccount - ALB
       run: |
+        kubectl config set-context --current --namespace=kube-system
+
         kubectl apply -f ./kubernetes/service-account.yaml
 
     - name: Install Helm
