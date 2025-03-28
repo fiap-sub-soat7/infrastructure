@@ -21,7 +21,7 @@ resource "aws_eks_cluster" "t75-eks_cluster" {
 resource "aws_eks_access_policy_association" "t75-eks_access_policy" {
   cluster_name = aws_eks_cluster.t75-eks_cluster.name
   policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-cluster-role"
+  principal_arn = "arn:aws:iam::025066260361:role/t75-eks-cluster-role"
 
   access_scope {
     type = "cluster"
