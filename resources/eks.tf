@@ -66,8 +66,8 @@ resource "aws_eks_node_group" "t75-eks-node_group" {
 
 resource "aws_eks_access_entry" "t75-eks_access_entry" {
   cluster_name  = aws_eks_cluster.t75-eks_cluster.name
-  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:role/t75-eks-cluster-role"
-  type          = "STANDARD"  # Or "EC2_LINUX"/"EC2_WINDOWS" if it was auto-created
+  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:user/github-actions-user"
+  type          = "STANDARD"
 }
 
 data "tls_certificate" "eks_oidc" {
