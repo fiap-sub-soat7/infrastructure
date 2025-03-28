@@ -14,16 +14,6 @@ resource "aws_eks_cluster" "t75-eks_cluster" {
   }
 }
 
-resource "aws_eks_access_policy_association" "t75-eks_access_policy" {
-  cluster_name = aws_eks_cluster.t75-eks_cluster.name
-  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-  principal_arn = aws_iam_role.eks_cluster_role.arn
-
-  access_scope {
-    type = "cluster"
-  }
-}
-
 resource "aws_eks_node_group" "t75-eks-node_group" {
   cluster_name = aws_eks_cluster.t75-eks_cluster.name
   node_group_name = "t75-eks-node-group"
@@ -44,6 +34,7 @@ resource "aws_eks_node_group" "t75-eks-node_group" {
   }
 }
 
+# 1. Create the IAM role
 # EKS Cluster Role (for the control plane)
 resource "aws_iam_role" "eks_cluster_role" {
   name = "t75-eks-cluster-role"
@@ -60,6 +51,24 @@ resource "aws_iam_role" "eks_cluster_role" {
       }
     ]
   })
+}
+
+# 2. Create the access entry
+resource "aws_eks_access_entry" "t75_eks_access_entry" {
+  cluster_name  = aws_eks_cluster.t75-eks_cluster.name
+  principal_arn = aws_iam_role.eks_cluster_role.arn
+}
+
+resource "aws_eks_access_policy_association" "t75-eks_access_policy" {
+  cluster_name = aws_eks_cluster.t75-eks_cluster.name
+  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = aws_iam_role.eks_cluster_role.arn
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [aws_eks_access_entry.t75_eks_access_entry]
 }
 
 resource "aws_iam_role" "eks_node_group" {
