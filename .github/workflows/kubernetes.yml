@@ -63,6 +63,8 @@ jobs:
       run: |
         kubectl config set-context --current --namespace=kube-system
 
+        kubectl apply -f ./kubernetes/permissions.yaml
+
         kubectl apply -f ./kubernetes/service-account.yaml
 
     - name: Install Helm

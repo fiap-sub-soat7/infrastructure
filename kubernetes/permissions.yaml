@@ -1,0 +1,25 @@
+# github-actions-kube-system-access.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: serviceaccount-manager
+  namespace: kube-system
+rules:
+- apiGroups: [""]
+  resources: ["serviceaccounts"]
+  verbs: ["get", "list", "create", "update", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: github-actions-serviceaccount-access
+  namespace: kube-system
+subjects:
+- kind: User
+  name: arn:aws:iam::025066260361:user/github-actions-user
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: serviceaccount-manager
+  apiGroup: rbac.authorization.k8s.io
