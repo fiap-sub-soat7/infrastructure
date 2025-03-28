@@ -17,7 +17,7 @@ metadata:
   namespace: kube-system
 subjects:
 - kind: User
-  name: arn:aws:iam::025066260361:user/github-actions-user
+  name: arn:aws:iam::${var.ACCOUNT_ID}:user/github-actions-user
   apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role

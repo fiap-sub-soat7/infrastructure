@@ -55,10 +55,10 @@ jobs:
           aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
 
           if [ -z "${{ inputs.ENVS }}" ]; then # if ENVS is provided, update pod envs
-            kubectl set env deployment/$DEPLOYMENT -n food-app ${{ inputs.ENVS }}
+            kubectl set env deployment/$DEPLOYMENT -n vehicle-app ${{ inputs.ENVS }}
           else
             # `set env` already forces a rollout
-            kubectl rollout restart -n food-app deployment/$DEPLOYMENT
+            kubectl rollout restart -n vehicle-app deployment/$DEPLOYMENT
           fi
 
       - name: Update deployment - Lambda

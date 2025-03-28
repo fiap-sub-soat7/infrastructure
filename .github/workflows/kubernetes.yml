@@ -90,5 +90,5 @@ jobs:
 
     - name: Apply kubernetes deployment
       run: |
-        kubectl apply -k . -n food-app
+        kubectl apply -k . -n vehicle-app
         kubectl apply -f ./kubernetes/load-balancer.yaml

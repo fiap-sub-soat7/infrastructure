@@ -42,19 +42,16 @@ vehicle.postech.app
   │   └── ...
 ```
 
-![Diagrama Clean Architecture - FoodApp](docs/app.drawio.png)
-_Diagrama Clean Architecture - FoodApp_
+![Diagrama Clean Architecture - VehicleApp](docs/app.drawio.png)
+_Diagrama Clean Architecture - VehicleApp
 
 ### • Services
 - [Client] - Serviço dedicado ao registro e autorização de clientes
 - [Vehicle] - Serviço dedicado aos veículos - CRUD
 
-### • Diagram - EventStorming
-- https://miro.com/miroverse/sistema-de-delivery/
-
 ## • Cloud Archtecture
 Arquitetura baseada em serviços AWS
-![Diagrama aplicação completa AWS - FoodApp](docs/kubernetes.drawio.png)
+![Diagrama aplicação completa AWS - VehicleApp](docs/kubernetes.drawio.png)
 _Diagrama aplicação completa AWS_
 
 
@@ -64,11 +61,6 @@ _Diagrama aplicação completa AWS_
 - Minimo 80%
 - Validação pipeline Pull Request
 - Update automático readme.me depois do merge
-
-### 🖥️ SAST - Sonarqube
-- Reports: https://sast.blackode.tech/
-- User: admin
-- Pass: FIAP___soat7
 
 ## | ✉️ • Running v4
 ### • AWS

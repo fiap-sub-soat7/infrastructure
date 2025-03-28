@@ -17,7 +17,7 @@ services:
       - |
         sed '7,30!d' etc/nginx/proxy.yaml > etc/nginx/nginx.conf
         sed -i "s@resolver kube@resolver 127.0.0.11; # &@" etc/nginx/nginx.conf
-        sed -i "s@.food-app.svc.cluster.local@@" etc/nginx/nginx.conf
+        sed -i "s@.vehicle-app.svc.cluster.local@@" etc/nginx/nginx.conf
         cat etc/nginx/nginx.conf
         nginx -g "daemon off;"
 

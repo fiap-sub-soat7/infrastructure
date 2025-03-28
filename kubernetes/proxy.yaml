@@ -15,11 +15,11 @@ data:
 
         location = / {
             add_header Content-Type text/html;
-            return 200 '<pre><h3>FIAP SOAT7 - T75</h3><br />eks/proxy/food-app@v4</pre>';
+            return 200 '<pre><h3>FIAP SOAT7 - T75</h3><br />eks/proxy/vehicle-app@v4</pre>';
         }
 
         location ~ ^/([\w_-]+)(/.*) {
-            proxy_pass http://app-svc-$1.food-app.svc.cluster.local$2;
+            proxy_pass http://app-svc-$1.vehicle-app.svc.cluster.local$2;
 
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;

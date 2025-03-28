@@ -71,7 +71,7 @@ resource "aws_iam_role" "eks_serviceaccount_role" {
       {
         Effect = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::025066260361:user/github-actions-user"
+          AWS = "arn:aws:iam::${var.ACCOUNT_ID}:user/github-actions-user"
         },
         Action = [
           "sts:AssumeRole",
@@ -196,7 +196,7 @@ resource "aws_iam_role_policy_attachment" "alb_controller_attach" {
 
 resource "aws_eks_access_entry" "github_actions_user_access_entry" {
   cluster_name  = aws_eks_cluster.t75-eks_cluster.name
-  principal_arn = "arn:aws:iam::025066260361:user/github-actions-user"
+  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:user/github-actions-user"
   type          = "STANDARD"
 }
 
