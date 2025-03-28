@@ -35,7 +35,7 @@ resource "aws_eks_node_group" "t75-eks-node_group" {
     aws_iam_role_policy_attachment.eks_worker_node_policy,
     aws_iam_role_policy_attachment.eks_cni_policy,
     aws_iam_role_policy_attachment.ec2_container_registry_readonly,
-    aws_eks_cluster.t75-eks_cluster
+    aws_eks_cluster.t75-eks_cluster 
   ]
 }
 
