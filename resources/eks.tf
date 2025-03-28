@@ -32,6 +32,13 @@ resource "aws_eks_node_group" "t75-eks-node_group" {
   update_config {
     max_unavailable = 1
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_worker_node_policy,
+    aws_iam_role_policy_attachment.eks_cni_policy,
+    aws_iam_role_policy_attachment.ec2_container_registry_readonly,
+    aws_eks_cluster.t75-eks_cluster
+  ]
 }
 
 # 1. Create the IAM role
@@ -84,4 +91,19 @@ resource "aws_iam_role" "eks_node_group" {
     }]
     Version = "2012-10-17"
   })
+}
+
+resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.eks_node_group.name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.eks_node_group.name
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_container_registry_readonly" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.eks_node_group.name
 }
