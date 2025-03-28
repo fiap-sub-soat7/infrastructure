@@ -66,7 +66,7 @@ resource "aws_eks_node_group" "t75-eks-node_group" {
 
 resource "aws_eks_access_entry" "t75-eks_access_entry" {
   cluster_name  = aws_eks_cluster.t75-eks_cluster.name
-  principal_arn = "arn:aws:iam::${var.ACCOUNT_ID}:user/github-actions-user"
+  principal_arn = "arn:aws:iam::025066260361:user/github-actions-user"
   type          = "STANDARD"
 }
 
