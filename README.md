@@ -43,43 +43,22 @@ vehicle.postech.app
 ```
 
 ![Diagrama Clean Architecture - VehicleApp](docs/app.drawio.png)
-_Diagrama Clean Architecture - VehicleApp
+Diagrama Clean Architecture - VehicleApp
 
 ### • Services
-- [Client] - Serviço dedicado ao registro e autorização de clientes
-- [Vehicle] - Serviço dedicado aos veículos - CRUD
-
-## • Cloud Archtecture
-Arquitetura baseada em serviços AWS
-![Diagrama aplicação completa AWS - VehicleApp](docs/kubernetes.drawio.png)
-_Diagrama aplicação completa AWS_
-
-
-## 🧪 Testing
-### ⛏️ Unit testing
-- Coveragem em cada repositorio de MS
-- Minimo 80%
-- Validação pipeline Pull Request
-- Update automático readme.me depois do merge
-
-## | ✉️ • Running v4
-### • AWS
-Implantado em: _(acesso AWS Academy ($))_
-- ApiGateway: https://tyhvt3bsuj.execute-api.us-east-1.amazonaws.com/v4/*
-- EC2: http://ec2-52-207-196-142.compute-1.amazonaws.com:30003/ [direto ao eks para testes]
+- [Vehicle] - Serviço dedicado aos veículos e venda
 
 ### • DOCKER (local env, development)
-1 - Run bash `./dev` inside infrastrure repo
+1 - Run bash `docker compose up` inside infrastrure repo
 
 Versão docker para desenvolvimento local:
-Client MS, Vehicle MS, databases e nginx proxy.
+Vehicle MS, databases e nginx proxy.
 ```sh
 # all repositories must be in an up enclosing folder
-./dev.sh
+docker compose up
 ```
 2 - Done :)
 ```
 http://localhost:3000/[microservice]/[endpoint] #proxy [ingress]
 http://localhost:3001/docs # vehicle [ms]
-http://localhost:3002/docs # client [ms]
 ```
