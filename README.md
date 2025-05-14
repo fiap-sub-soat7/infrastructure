@@ -2,9 +2,9 @@
 ## VehicleAPI
 
 ## | 🖥️ • Architecture
-### • Technologies
+### Technologies
 Typescript, NodeJS, Mongo (Document DB)
-### • Project structure - Clean Architecture
+###  Project structure - Clean Architecture
 ```
 vehicle.postech.app
   ├── domain/                            # Camada I - Entities
@@ -41,9 +41,11 @@ vehicle.postech.app
   │   │   └── ...
   │   └── ...
 ```
-
+### Diagrama Clean Architecture - VehicleAPP
 ![Diagrama Clean Architecture - VehicleAPP](docs/app.drawio.png)
 
+### Diagrama - Event Storming e Domain Storytelling
+https://miro.com/app/board/uXjVI26d5po=/
 
 ### Services
 - [Vehicle] - Serviço dedicado aos veículos e venda
