@@ -42,10 +42,6 @@ vehicle.postech.app
   │   └── ...
 ```
 
-![Diagrama Clean Architecture - Exemplo MS](docs/app.drawio.png)
-_Diagrama Clean Architecture - Exemplo MS_
-
-
 ### • Services
 - [Vehicle] - Serviço dedicado aos veículos e venda
 
@@ -63,3 +59,5 @@ docker compose up
 http://localhost:3000/[microservice]/[endpoint] #proxy [ingress]
 http://localhost:3001/docs # vehicle [ms]
 ```
+
+![Diagrama Clean Architecture - Exemplo MS](docs/app.drawio.png)
