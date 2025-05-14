@@ -42,10 +42,13 @@ vehicle.postech.app
   │   └── ...
 ```
 
-### • Services
+![Diagrama Clean Architecture - VehicleAPP](docs/app.drawio.png)
+
+
+### Services
 - [Vehicle] - Serviço dedicado aos veículos e venda
 
-### • DOCKER (local env, development)
+### DOCKER (local env, development)
 1 - Run bash `docker compose up` inside infrastrure repo
 
 Versão docker para desenvolvimento local:
@@ -60,4 +63,4 @@ http://localhost:3000/[microservice]/[endpoint] #proxy [ingress]
 http://localhost:3001/docs # vehicle [ms]
 ```
 
-![Diagrama Clean Architecture - Exemplo MS](docs/app.drawio.png)
+
