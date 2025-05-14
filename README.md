@@ -43,8 +43,7 @@ vehicle.postech.app
 ```
 
 ![Diagrama Clean Architecture - VehicleApp](docs/app.drawio.png)
-A
-
+Diagrama Clean Architecture - VehicleApp
 
 ### • Services
 - [Vehicle] - Serviço dedicado aos veículos e venda
