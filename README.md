@@ -42,11 +42,7 @@ vehicle.postech.app
   │   └── ...
 ```
 
-
-
-
 ![Diagrama Clean Architecture - VehicleApp](docs/app.drawio.png)
-
 
 
 ### • Services
