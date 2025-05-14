@@ -3,7 +3,7 @@
 
 ## | 🖥️ • Architecture
 ### • Technologies
-_Typescript, NodeJS, Mongo (Document DB)
+Typescript, NodeJS, Mongo (Document DB)
 ### • Project structure - Clean Architecture
 ```
 vehicle.postech.app
@@ -41,6 +41,7 @@ vehicle.postech.app
   │   │   └── ...
   │   └── ...
 ```
+
 
 ![Diagrama Clean Architecture - VehicleApp](docs/app.drawio.png)
 Diagrama Clean Architecture - VehicleApp
